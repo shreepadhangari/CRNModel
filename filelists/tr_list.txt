@@ -1,0 +1,10 @@
+../data/datasets/tr/tr_0.ex
+../data/datasets/tr/tr_1.ex
+../data/datasets/tr/tr_2.ex
+../data/datasets/tr/tr_3.ex
+../data/datasets/tr/tr_4.ex
+../data/datasets/tr/tr_5.ex
+../data/datasets/tr/tr_6.ex
+../data/datasets/tr/tr_7.ex
+../data/datasets/tr/tr_8.ex
+../data/datasets/tr/tr_9.ex
