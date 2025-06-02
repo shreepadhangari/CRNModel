@@ -16,7 +16,6 @@ from utils.pipeline_modules import NetFeeder, Resynthesizer
 from utils.data_utils import AudioLoader
 from utils.networks import Net
 from utils.criteria import LossFunction
-from tqdm import tqdm
 
 
 class CheckPoint(object):
@@ -143,9 +142,7 @@ class Model(object):
             accu_tr_loss = 0.
             accu_n_frames = 0
             net.train()
-            performed_optimization = False  # Track if optimizer.step() was called
-
-            for n_iter, egs in enumerate(tqdm(tr_loader)):
+            for n_iter, egs in enumerate(tr_loader):
                 n_iter += start_iter
                 mix = egs['mix']
                 sph = egs['sph']
@@ -158,11 +155,10 @@ class Model(object):
                 n_frames = countFrames(n_samples, self.win_size, self.hop_size)
 
                 start_time = timeit.default_timer()
-
+                
                 # prepare features and labels
                 feat, lbl = feeder(mix, sph)
                 loss_mask = lossMask(shape=lbl.shape, n_frames=n_frames, device=self.device)
-
                 # forward + backward + optimize
                 optimizer.zero_grad()
                 with torch.enable_grad():
@@ -172,8 +168,6 @@ class Model(object):
                 if self.clip_norm >= 0.0:
                     clip_grad_norm_(net.parameters(), self.clip_norm)
                 optimizer.step()
-                performed_optimization = True  # Mark that optimizer was stepped
-
                 # calculate loss
                 running_loss = loss.data.item()
                 accu_tr_loss += running_loss * sum(n_frames)
@@ -184,50 +178,46 @@ class Model(object):
 
                 if self.time_log:
                     with open(self.time_log, 'a+') as f:
-                        print('Epoch [{}/{}], Iter [{}], tr_loss = {:.4f} / {:.4f}, batch_time (s) = {:.4f}'.format(
-                            ckpt_info['cur_epoch'] + 1, self.max_n_epochs, n_iter,
-                            running_loss, accu_tr_loss / accu_n_frames, batch_time), file=f)
+                        print('Epoch [{}/{}], Iter [{}], tr_loss = {:.4f} / {:.4f}, batch_time (s) = {:.4f}'.format(ckpt_info['cur_epoch']+1,
+                            self.max_n_epochs, n_iter, running_loss, accu_tr_loss / accu_n_frames, batch_time), file=f)
                         f.flush()
                 else:
-                    print('Epoch [{}/{}], Iter [{}], tr_loss = {:.4f} / {:.4f}, batch_time (s) = {:.4f}'.format(
-                        ckpt_info['cur_epoch'] + 1, self.max_n_epochs, n_iter,
-                        running_loss, accu_tr_loss / accu_n_frames, batch_time), flush=True)
-
-                # checkpointing and logging
+                    print('Epoch [{}/{}], Iter [{}], tr_loss = {:.4f} / {:.4f}, batch_time (s) = {:.4f}'.format(ckpt_info['cur_epoch']+1,
+                        self.max_n_epochs, n_iter, running_loss, accu_tr_loss / accu_n_frames, batch_time), flush=True)
+ 
+        
                 if (n_iter + 1) % self.logging_period == 0:
                     avg_tr_loss = accu_tr_loss / accu_n_frames
                     avg_cv_loss = self.validate(net, cv_loader, criterion, feeder)
                     net.train()
-
+                
                     ckpt_info['cur_iter'] = n_iter
-                    is_best = avg_cv_loss < ckpt_info['best_loss']
-                    if is_best:
-                        ckpt_info['best_loss'] = avg_cv_loss
-
-                    ckpt_info['tr_loss'] = avg_tr_loss
-                    ckpt_info['cv_loss'] = avg_cv_loss
-
-                    model_path = os.path.join(self.ckpt_dir, 'models')
-                    if not os.path.isdir(model_path):
-                        os.makedirs(model_path)
-
+                    is_best = True if avg_cv_loss < ckpt_info['best_loss'] else False
+                    ckpt_info['best_loss'] = avg_cv_loss if is_best else ckpt_info['best_loss']
                     latest_model = 'latest.pt'
                     best_model = 'best.pt'
-
+                    ckpt_info['tr_loss'] = avg_tr_loss
+                    ckpt_info['cv_loss'] = avg_cv_loss
                     if len(self.gpu_ids) > 1:
                         ckpt = CheckPoint(ckpt_info, net.module.state_dict(), optimizer.state_dict())
                     else:
                         ckpt = CheckPoint(ckpt_info, net.state_dict(), optimizer.state_dict())
-
                     logger.info('Saving checkpoint into {}'.format(os.path.join(self.ckpt_dir, latest_model)))
                     if is_best:
                         logger.info('Saving checkpoint into {}'.format(os.path.join(self.ckpt_dir, best_model)))
-                    logger.info('Epoch [{}/{}], ( tr_loss: {:.4f} | cv_loss: {:.4f} )\n'.format(
-                        ckpt_info['cur_epoch'] + 1, self.max_n_epochs, avg_tr_loss, avg_cv_loss))
+                    logger.info('Epoch [{}/{}], ( tr_loss: {:.4f} | cv_loss: {:.4f} )\n'.format(ckpt_info['cur_epoch']+1,
+                        self.max_n_epochs, avg_tr_loss, avg_cv_loss))
+                    
+                    model_path = os.path.join(self.ckpt_dir, 'models')
+                    if not os.path.isdir(model_path):
+                        os.makedirs(model_path)
 
-                    ckpt.save(os.path.join(model_path, latest_model), is_best, os.path.join(model_path, best_model))
+                    ckpt.save(os.path.join(model_path, latest_model),
+                              is_best,
+                              os.path.join(model_path, best_model))
+                    
                     lossLog(os.path.join(self.ckpt_dir, self.loss_log), ckpt, self.logging_period)
-
+            
                     accu_tr_loss = 0.
                     accu_n_frames = 0
 
@@ -235,13 +225,10 @@ class Model(object):
                         start_iter = 0
                         ckpt_info['cur_iter'] = 0
                         break
-                print(f"[INFO] Epoch {ckpt_info['cur_epoch']+1}, Iter {n_iter+1} running...")
-
-
-            if performed_optimization:
-                scheduler.step()  # safe: only after optimizer.step() was called
-
+                    
             ckpt_info['cur_epoch'] += 1
+            scheduler.step() # learning rate decay
+        
         return
 
     def validate(self, net, cv_loader, criterion, feeder):

@@ -4,7 +4,7 @@
 ckpt_dir=exp
 gpus=0
 
-python -B ./train.py \
+python3 -B ./train.py \
     --gpu_ids=$gpus \
     --tr_list=../filelists/tr_list.txt \
     --cv_file=../data/datasets/cv/cv.ex \
