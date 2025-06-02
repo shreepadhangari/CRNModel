@@ -1,0 +1,30 @@
+2025-06-02 09:20:15 [/mnt/d/signals/crnmodel/scripts/utils/models.py:106 - INFO ] Model summary:
+Net(
+  (conv1): Conv2d(1, 16, kernel_size=(2, 3), stride=(1, 2), padding=(1, 0))
+  (conv2): Conv2d(16, 32, kernel_size=(2, 3), stride=(1, 2), padding=(1, 0))
+  (conv3): Conv2d(32, 64, kernel_size=(2, 3), stride=(1, 2), padding=(1, 0))
+  (conv4): Conv2d(64, 128, kernel_size=(2, 3), stride=(1, 2), padding=(1, 0))
+  (conv5): Conv2d(128, 256, kernel_size=(2, 3), stride=(1, 2), padding=(1, 0))
+  (lstm): LSTM(1024, 1024, num_layers=2, batch_first=True)
+  (conv5_t): ConvTranspose2d(512, 128, kernel_size=(2, 3), stride=(1, 2), padding=(1, 0))
+  (conv4_t): ConvTranspose2d(256, 64, kernel_size=(2, 3), stride=(1, 2), padding=(1, 0))
+  (conv3_t): ConvTranspose2d(128, 32, kernel_size=(2, 3), stride=(1, 2), padding=(1, 0))
+  (conv2_t): ConvTranspose2d(64, 16, kernel_size=(2, 3), stride=(1, 2), padding=(1, 0), output_padding=(0, 1))
+  (conv1_t): ConvTranspose2d(32, 1, kernel_size=(2, 3), stride=(1, 2), padding=(1, 0))
+  (bn1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (bn2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (bn3): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (bn4): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (bn5): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (bn5_t): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (bn4_t): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (bn3_t): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (bn2_t): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (bn1_t): BatchNorm2d(1, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (elu): ELU(alpha=1.0, inplace=True)
+  (softplus): Softplus(beta=1.0, threshold=20.0)
+)
+2025-06-02 09:20:17 [/mnt/d/signals/crnmodel/scripts/utils/models.py:114 - INFO ] Trainable parameter count: 17,579,459 -> 67.06 MB
+
+2025-06-02 09:20:32 [/mnt/d/signals/crnmodel/scripts/utils/models.py:141 - INFO ] Training from scratch...
+

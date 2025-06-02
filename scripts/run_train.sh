@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-ckpt_dir=exp
+ckpt_dir=opmodel
 gpus=0
 
 python3 -B ./train.py \
@@ -13,6 +13,6 @@ python3 -B ./train.py \
     --lr=0.0002 \
     --time_log=./time.log \
     --unit=utt \
-    --batch_size=16 \
+    --batch_size=2 \
     --buffer_size=32 \
     --max_n_epochs=20 \

@@ -17,7 +17,6 @@ from utils.data_utils import AudioLoader
 from utils.networks import Net
 from utils.criteria import LossFunction
 
-
 class CheckPoint(object):
     def __init__(self, ckpt_info=None, net_state_dict=None, optim_state_dict=None):
         self.ckpt_info = ckpt_info
@@ -36,8 +35,7 @@ class CheckPoint(object):
         self.ckpt_info = ckpt.ckpt_info 
         self.net_state_dict = ckpt.net_state_dict
         self.optim_state_dict = ckpt.optim_state_dict
-
-
+        
 class Model(object):
     def __init__(self):
         self.in_norm = exp_conf['in_norm']
